@@ -15,7 +15,7 @@ cd SklearnHyperStream
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
-python example_classifier.py --dataset iris --epochs 20 --seed 42
+python example_classifier.py --dataset iris --classifier SGDClassifier --epochs 20 --seed 42
 ```
 
 At the end of the training you should see the test scores during the training

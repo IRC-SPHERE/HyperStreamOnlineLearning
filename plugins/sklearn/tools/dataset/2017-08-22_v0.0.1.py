@@ -44,13 +44,12 @@ class Dataset(Tool):
         classes = np.unique(y)
         y = label_binarize(y, classes)
 
-        X_tr, X_te, Y_tr, Y_te = train_test_split(x, y, shuffle=self.shuffle,
-                                                  train_size=0.5, stratify=y,
-                                                  random_state=self.seed)
-
         j = 0
         start_dt = datetime.utcfromtimestamp(0).replace(tzinfo=UTC)
         for i in range(self.epochs):
+            X_tr, X_te, Y_tr, Y_te = train_test_split(
+                    x, y, shuffle=self.shuffle, train_size=0.5, stratify=y,
+                    random_state=self.seed)
             for x_tr, y_tr in zip(X_tr, Y_tr):
                 x_te, y_te = X_te[j % len(X_te)], Y_te[j % len(Y_te)]
                 j += 1

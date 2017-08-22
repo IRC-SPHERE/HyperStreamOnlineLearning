@@ -21,7 +21,6 @@
 
 from hyperstream import Tool, StreamInstance
 from hyperstream.utils import check_input_stream_count
-from sklearn.multiclass import OneVsRestClassifier
 
 import numpy as np
 
@@ -35,8 +34,6 @@ class Classifier(Tool):
     def _execute(self, sources, alignment_stream, interval):
         s0 = sources[0].window(interval, force_calculation=True).items()
 
-        self.classifier = OneVsRestClassifier(self.model)
-
         first = True
         for dt, value in s0:
             x_tr = value['x_tr']
@@ -49,10 +46,21 @@ class Classifier(Tool):
 
             if first:
                 self.classes = range(value['y_tr'].shape[1])
-                self.classifier.partial_fit(x_tr, y_tr, self.classes)
+                if hasattr(self.model, 'partial_fit'):
+                    self.fit = self.model.partial_fit
+                else:
+                    self.fit = self.model.fit
+
+                self.fit(x_tr, y_tr, self.classes)
+
+                if hasattr(self.model, 'predict_proba'):
+                    self.predict_proba = self.model.predict_proba
+                else:
+                    self.predict_proba = self.model.predict
+
                 first = False
             else:
-                self.classifier.partial_fit(x_tr, y_tr)
-            proba_tr = self.classifier.predict_proba(x_tr)
-            score = self.classifier.score(x_te, y_te)
+                self.fit(x_tr, y_tr)
+            proba_tr = self.predict_proba(x_tr)
+            score = self.model.score(x_te, y_te)
             yield StreamInstance(dt, dict(proba=proba_tr, score=score))

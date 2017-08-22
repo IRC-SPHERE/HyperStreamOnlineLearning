@@ -3,8 +3,7 @@ import argparse
 
 from datetime import datetime, timedelta
 
-from sklearn import datasets
-from sklearn.linear_model import SGDClassifier
+from sklearn import datasets, linear_model
 
 from hyperstream import HyperStream, TimeInterval
 from hyperstream.utils import UTC
@@ -12,6 +11,10 @@ from hyperstream.utils import UTC
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-c', '--classifier', type=str,
+                        default='SGDClassifier',
+                        help='''Classifier to use. Working options:
+                                SGDClassifier, PassiveAggressiveClassifier''')
     parser.add_argument('-d', '--dataset', type=str, default='iris',
                         help='''Dataset to use. Working options: iris,
                                 breast_cancer, wine, digits''')
@@ -23,7 +26,7 @@ def get_arguments():
     return parser.parse_args()
 
 
-def main(dataset, epochs, seed):
+def main(dataset, classifier, epochs, seed):
     hs = HyperStream(loglevel=30)
     print(hs)
     print([p.channel_id_prefix for p in hs.config.plugins])
@@ -35,8 +38,8 @@ def main(dataset, epochs, seed):
                                                  epochs=epochs, seed=seed)
     data_stream = M.get_or_create_stream('dataset')
 
-    classifier = SGDClassifier(loss="log", penalty="l2")
-    classifier_tool = hs.plugins.sklearn.tools.classifier(classifier)
+    model = getattr(linear_model, classifier)()
+    classifier_tool = hs.plugins.sklearn.tools.classifier(model)
     classifier_stream = M.get_or_create_stream('classifier')
 
     now = datetime.utcnow().replace(tzinfo=UTC)
