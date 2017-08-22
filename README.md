@@ -15,5 +15,14 @@ cd SklearnHyperStream
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
-python example_classifier.py --dataset iris --epochs 20
+python example_classifier.py --dataset iris --epochs 20 --seed 42
+```
+
+At the end of the training you should see the test scores during the training
+for each epoch
+
+```Python
+Test scores per epoch during training
+[ 0.52  0.63  0.68  0.73  0.72  0.73  0.69  0.72  0.73  0.69  0.75  0.71
+  0.75  0.76  0.71  0.69  0.76  0.69  0.71  0.69]
 ```

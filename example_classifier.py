@@ -17,11 +17,13 @@ def get_arguments():
                                 breast_cancer, wine, digits''')
     parser.add_argument('-e', '--epochs', type=int, default=10,
                         help='Number of epochs to run the classifier')
+    parser.add_argument('-s', '--seed', type=int, default=42,
+                        help='Seed for the data shuffle')
 
     return parser.parse_args()
 
 
-def main(dataset, epochs):
+def main(dataset, epochs, seed):
     hs = HyperStream(loglevel=30)
     print(hs)
     print([p.channel_id_prefix for p in hs.config.plugins])
@@ -30,7 +32,7 @@ def main(dataset, epochs):
 
     data = getattr(datasets, 'load_{}'.format(dataset))()
     data_tool = hs.plugins.sklearn.tools.dataset(data, shuffle=True,
-                                                 epochs=epochs)
+                                                 epochs=epochs, seed=seed)
     data_stream = M.get_or_create_stream('dataset')
 
     classifier = SGDClassifier(loss="log", penalty="l2")
@@ -55,6 +57,7 @@ def main(dataset, epochs):
     for key, value in classifier_stream.window():
         scores.append(value['score'])
 
+    print("Test scores per epoch during training")
     scores = np.array(scores).reshape(epochs, -1)
     print(scores.mean(axis=1).round(decimals=2))
 

@@ -31,9 +31,9 @@ from pytz import UTC
 
 
 class Dataset(Tool):
-    def __init__(self, dataset, shuffle=True, epochs=1):
+    def __init__(self, dataset, shuffle=True, epochs=1, seed=None):
         super(Dataset, self).__init__(dataset=dataset, shuffle=shuffle,
-                                      epochs=epochs)
+                                      epochs=epochs, seed=seed)
 
     @check_input_stream_count(0)
     def _execute(self, sources, alignment_stream, interval):
@@ -45,7 +45,8 @@ class Dataset(Tool):
         y = label_binarize(y, classes)
 
         X_tr, X_te, Y_tr, Y_te = train_test_split(x, y, shuffle=self.shuffle,
-                                                  train_size=0.5, stratify=y)
+                                                  train_size=0.5, stratify=y,
+                                                  random_state=self.seed)
 
         j = 0
         start_dt = datetime.utcfromtimestamp(0).replace(tzinfo=UTC)
