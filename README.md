@@ -15,5 +15,5 @@ cd SklearnHyperStream
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
-python example_classifier.py
+python example_classifier.py --dataset iris --epochs 20
 ```
