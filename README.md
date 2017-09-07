@@ -42,9 +42,9 @@ pip install -r keras_requirements.txt
 python example_classifier.py --dataset digits --classifier mlp30ds40m --epochs 20 --seed 42
 ```
 
+```Python
+[ 0.67  0.88  0.9   0.92  0.93  0.92  0.92  0.93  0.93  0.93  0.94  0.95
+  0.95  0.94  0.94  0.94  0.94  0.94  0.94  0.94]
 At the end of the training you should see the test scores during the training
 for each epoch
-
-```Python
-Test scores per epoch during training
 ```
