@@ -28,7 +28,7 @@ class MyKerasClassifier(object):
         self.model = None
         self.architecture = architecture
 
-    def fit(self, x, y, **kwargs):
+    def fit(self, x, y, classes=None, **kwargs):
         """Constructs a new model with `build_fn` & fit the model to `(x, y)`.
         # Arguments
             x : array-like, shape `(n_samples, n_features)`
@@ -42,8 +42,8 @@ class MyKerasClassifier(object):
             history : object
                 details about the training history at each epoch.
         """
-        if 'classes' in kwargs:
-            self.classes = kwargs['classes']
+        if classes is not None:
+            self.classes = classes
 
         if y.shape[1] <= 1:
             y = label_binarize(y, self.classes)
