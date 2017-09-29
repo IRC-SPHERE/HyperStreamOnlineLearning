@@ -39,7 +39,7 @@ virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
 pip install -r keras_requirements.txt
-python example_classifier.py --dataset digits --classifier mlp30ds40m --epochs 20 --seed 42
+python example_classifier_keras.py --dataset digits --classifier mlp30ds40m --epochs 20 --seed 42
 ```
 
 ```Python
