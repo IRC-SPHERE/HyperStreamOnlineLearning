@@ -22,45 +22,34 @@
 from hyperstream import Tool, StreamInstance
 from hyperstream.utils import check_input_stream_count
 
+import itertools
 import numpy as np
 
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+       chunk = tuple(itertools.islice(it, n))
+       if not chunk:
+           return
+       yield chunk
 
-class Classifier(Tool):
-    def __init__(self, model, **fit_arguments):
-        super(Classifier, self).__init__(model=model,
-                                         fit_arguments=fit_arguments)
+class Minibatch(Tool):
+    def __init__(self, batchsize, **fit_arguments):
+        super(Minibatch, self).__init__(batchsize=batchsize)
 
     @check_input_stream_count(1)
     def _execute(self, sources, alignment_stream, interval):
         s0 = sources[0].window(interval, force_calculation=True).items()
 
-        first = True
-        for dt, value in s0:
-            x_tr = value['x_tr']
-            x_te = value['x_te']
-            if len(x_tr.shape) == 1:
-                x_tr = x_tr.reshape(1, -1)
-                x_te = x_te.reshape(1, -1)
-            y_tr = np.argmax(value['y_tr'], axis=1).reshape(-1, 1)
-            y_te = np.argmax(value['y_te'], axis=1).reshape(-1, 1)
-
-            if first:
-                self.classes = range(value['y_tr'].shape[1])
-                if hasattr(self.model, 'partial_fit'):
-                    self.fit = self.model.partial_fit
-                else:
-                    self.fit = self.model.fit
-
-                self.fit(x_tr, y_tr, self.classes)
-
-                if hasattr(self.model, 'predict_proba'):
-                    self.predict_proba = self.model.predict_proba
-                else:
-                    self.predict_proba = self.model.predict
-
-                first = False
-            else:
-                self.fit(x_tr, y_tr)
-            proba_tr = self.predict_proba(x_tr)
-            score = self.model.score(x_te, y_te)
-            yield StreamInstance(dt, dict(proba=proba_tr, score=score))
+        i = 1
+        for batch in grouper(self.batchsize, s0):
+            i += 1
+            dt = batch[0][0]
+            # Try to reduce these 5 lines into one?
+            x_te = np.concatenate([b[1]['x_te'] for b in batch])
+            x_tr = np.concatenate([b[1]['x_tr'] for b in batch])
+            y_te = np.concatenate([b[1]['y_te'] for b in batch])
+            y_tr = np.concatenate([b[1]['y_tr'] for b in batch])
+            value = dict(x_te=x_te, x_tr=x_tr, y_te=y_te, y_tr=y_tr)
+            yield StreamInstance(dt, value)
+            # Try to reduce these 5 lines into one?

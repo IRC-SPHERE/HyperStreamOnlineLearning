@@ -22,11 +22,13 @@ def get_arguments():
                         help='Number of epochs to run the classifier')
     parser.add_argument('-s', '--seed', type=int, default=42,
                         help='Seed for the data shuffle')
+    parser.add_argument('-b', '--batchsize', type=int, default=1,
+                        help='Batch size during training')
 
     return parser.parse_args()
 
 
-def main(dataset, classifier, epochs, seed):
+def main(dataset, classifier, epochs, seed, batchsize):
     hs = HyperStream(loglevel=30)
     print(hs)
     print([p.channel_id_prefix for p in hs.config.plugins])
@@ -53,16 +55,29 @@ def main(dataset, classifier, epochs, seed):
     key, value = data_stream.window().iteritems().next()
     print('[%s]: %s' % (key, value))
 
-    classifier_tool.execute(sources=[data_stream], sink=classifier_stream,
+    mini_batch_tool = hs.plugins.sklearn.tools.minibatch(batchsize=batchsize)
+    mini_batch_stream = M.get_or_create_stream('mini_batch')
+    mini_batch_tool.execute(sources=[data_stream], sink=mini_batch_stream,
+                            interval=ti)
+
+    classifier_tool.execute(sources=[mini_batch_stream], sink=classifier_stream,
                             interval=ti)
 
     scores = []
     for key, value in classifier_stream.window():
         scores.append(value['score'])
 
-    print("Test scores per epoch during training")
-    scores = np.array(scores).reshape(epochs, -1)
-    print(scores.mean(axis=1).round(decimals=2))
+    # The data is repeated the number of epochs. This makes the mini-batches to
+    # cycle and contain data from the begining and end of the dataset. This
+    # makes possible that the number of scores is not divisible by epochs.
+    if batchsize == 1:
+        print("Test scores per epoch")
+        scores = np.array(scores).reshape(epochs, -1)
+        print(scores.mean(axis=1).round(decimals=2))
+    else:
+        scores = np.array(scores).reshape(1,-1)
+        print("Test scores per minibatch (cyclic)")
+        print(scores.round(decimals=2))
 
 
 if __name__ == '__main__':
