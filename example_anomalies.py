@@ -8,6 +8,26 @@ from sklearn import datasets, linear_model
 from hyperstream import HyperStream, TimeInterval
 from hyperstream.utils import UTC
 
+
+class BackgroundCheck(object):
+    def __init__(self, model):
+        self.model = model
+
+    def fit(self, x):
+        self.model.fit(x)
+
+    def prob_foreground(self, x):
+        l = self.model.likelihood(x)
+        l_max = self.model.max
+        return np.true_divide(l, l_max)
+
+    def prob_background(self, x):
+        return 1 - self.prob_foreground(x)
+
+    def predict_proba(self, x):
+        return self.prob_background(x)
+
+
 class GaussianEstimator(object):
     def __init__(self):
         self.mu = None
@@ -45,6 +65,12 @@ class GaussianEstimator(object):
                     + self.k * np.log(2*np.pi)
                     )
 
+    @property
+    def max(self):
+        return self.likelihood(self.mu.reshape(1,-1))
+
+
+
 def get_arguments():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-m', '--model', type=str,
@@ -77,7 +103,7 @@ def main(dataset, model, epochs, seed, batchsize):
     data_stream = M.get_or_create_stream('dataset')
 
     if model == 'Gaussian':
-        model = GaussianEstimator()
+        model = BackgroundCheck(GaussianEstimator())
     else:
         raise(ValueError('Unknown model {}'.format(model)))
 

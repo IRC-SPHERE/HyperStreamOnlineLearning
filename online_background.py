@@ -10,9 +10,26 @@ n_samples = 5000
 MU = np.array([0.5, 1.5])
 COV = np.array([[1., 0.7], [0.7, 2.]])
 
-
 def get_samples(n):
     return np.random.multivariate_normal(mean=MU, cov=COV, size=n)
+
+class BackgroundCheck(object):
+    def __init__(self, model):
+        self.model = model
+
+    def fit(self, x):
+        self.model.fit(x)
+
+    def prob_foreground(self, x):
+        l = self.model.likelihood(x)
+        l_max = self.model.max
+        return np.true_divide(l, l_max)
+
+    def prob_background(self, x):
+        return 1 - self.prob_foreground(x)
+
+    def predict_proba(self, x):
+        return self.prob_background(x)
 
 
 class GaussianEstimation(object):
@@ -57,47 +74,22 @@ class GaussianEstimation(object):
         return self.likelihood(self.mu.reshape(1,-1))
 
 
-mu = []
-cov = []
-
-gaussian = GaussianEstimation()
+model = BackgroundCheck(GaussianEstimation())
 for i in range(n_samples/2):
     x = get_samples(2)
-    gaussian.fit(x)
-    mu.append(gaussian.mu)
-    cov.append(gaussian.cov)
-
-mu = np.array(mu)
-cov = np.array(cov)
-
-fig = plt.figure('mu')
-fig.clf()
-ax = fig.add_subplot(111)
-for i in range(2):
-    p = ax.plot(mu[:,i], label='$\mu_{}$'.format(i))
-    ax.add_line(Line2D([0, n_samples/2], [MU[i], MU[i]], linewidth=0.5,
-        color=p[0].get_color()))
-for i in range(2):
-    for j in range(2):
-        p = ax.plot(cov[:,i,j], label='cov[{0},{1}]'.format(i,j))
-        ax.add_line(Line2D([0, n_samples/2], [COV[i,j], COV[i,j]],
-                           linewidth=0.5, color=p[0].get_color()))
-ax.set_xlabel('samples/2')
-ax.set_ylabel('estimation')
-ax.legend()
-fig.savefig('mus.svg')
+    model.fit(x)
 
 x = get_samples(n_samples)
 
-l = gaussian.likelihood(x)
+p_foreground = 1 - model.predict_proba(x)
 fig = plt.figure('scatter')
 fig.clf()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(x[:,0], x[:,1], l)
+ax.scatter(x[:,0], x[:,1], p_foreground)
 ax.set_xlabel('$x_0$')
 ax.set_ylabel('$x_1$')
-ax.set_zlabel('likelihood')
-fig.savefig('likelihood_x.svg')
+ax.set_zlabel('p_foreground')
+fig.savefig('p_foreground_x.svg')
 
 
 X = np.linspace(min(x[:,0]), max(x[:,0]), 30)
@@ -105,13 +97,13 @@ Y = np.linspace(min(x[:,1]), max(x[:,1]), 30)
 X, Y = np.meshgrid(X, Y)
 
 grid = np.concatenate((X.reshape(-1,1), Y.reshape(-1,1)), axis=1)
-l = gaussian.likelihood(grid).reshape(X.shape[0], X.shape[1])
+p_foreground = 1 - model.predict_proba(grid).reshape(X.shape[0], X.shape[1])
 
 fig = plt.figure('surface')
 fig.clf()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X, Y, l, cmap=cm.coolwarm)
+ax.plot_surface(X, Y, p_foreground, cmap=cm.coolwarm)
 ax.set_xlabel('$x_0$')
 ax.set_ylabel('$x_1$')
-ax.set_zlabel('likelihood')
-fig.savefig('likelihood_grid.svg')
+ax.set_zlabel('p_foreground')
+fig.savefig('p_foreground_grid.svg')
