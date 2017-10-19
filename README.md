@@ -42,9 +42,36 @@ pip install -r keras_requirements.txt
 python example_classifier_keras.py --dataset digits --classifier mlp30ds40m --epochs 20 --seed 42
 ```
 
+At the end of the training you should see the test scores during the training
+for each epoch
+
 ```Python
 [ 0.67  0.88  0.9   0.92  0.93  0.92  0.92  0.93  0.93  0.93  0.94  0.95
   0.95  0.94  0.94  0.94  0.94  0.94  0.94  0.94]
+```
+
+## Example of Anomaly detection
+
+Example of a model that trains only with the input space and predicts if the
+test data has been drawn from the same distribution. In this case using a
+Multivariate-Gaussian to estimate the density of the training data.
+
+```bash
+git clone git@github.com:IRC-SPHERE/SklearnHyperStream.git
+cd SklearnHyperStream
+virtualenv venv
+. venv/bin/activate
+pip install -r requirements.txt
+pip install -r keras_requirements.txt
+python example_anomalies.py --dataset iris --model Gaussian --epochs 1 --seed 42 -b 2
+```
+
 At the end of the training you should see the test scores during the training
 for each epoch
+
+```
+[  nan   nan  1.    1.    0.67  1.    0.8   0.88  0.97  0.98  0.85  1.
+  0.85  0.95  0.83  0.94  0.65  0.8   0.95  0.79  0.91  0.54  0.88  0.63
+  0.63  0.94  0.87  0.82  0.72  0.78  0.98  0.82  0.76  0.79  0.65  0.87
+  0.89  0.85]
 ```
