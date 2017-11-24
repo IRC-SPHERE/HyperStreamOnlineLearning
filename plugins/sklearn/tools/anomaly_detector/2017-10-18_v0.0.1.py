@@ -26,6 +26,20 @@ import numpy as np
 
 class AnomalyDetector(Tool):
     def __init__(self, model, **fit_arguments):
+        """
+        It requires an unsupervised online-learning model.
+
+        Parameters
+        ==========
+        model: object with the following functions
+            partial_fit or fit(x, **kwargs):
+                trains the model with x
+            predict_proba or predict or likelihood(x):
+                returns a prediction for x
+
+        fit_arguments: dictionary (Not implemented yet)
+            Dictionary that will be passed to the fit function as **kwargs
+        """
         super(AnomalyDetector, self).__init__(model=model,
                                               fit_arguments=fit_arguments)
 

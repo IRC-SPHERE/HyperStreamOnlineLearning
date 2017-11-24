@@ -32,12 +32,46 @@ from pytz import UTC
 
 class Dataset(Tool):
     def __init__(self, dataset, shuffle=True, epochs=1, seed=None):
+        """
+        Converts a static dataset into a stream with timestamps
+
+        Parameters
+        ==========
+        dataset: data structure with the following attributes
+            data: matrix
+                Matrix with one row per sample and one column per feature
+            target: array of int
+                Array of integers with one label per sample
+
+        shuffle: boolean
+            Value indicating if the data needs to be shuffled
+
+        epochs: Integer
+            Number of iterations that the data will be repeated
+
+        seed: Integer
+            seed for the shuffling process
+        """
         super(Dataset, self).__init__(dataset=dataset, shuffle=shuffle,
                                       epochs=epochs, seed=seed)
 
     @check_input_stream_count(0)
     def _execute(self, sources, alignment_stream, interval):
+        """
+        Processes the input data and produces streamed data
 
+        yelds
+        =====
+        stream : with date and dictionary with following entries
+            x_tr: array of float
+                Training values for the given data stream
+            y_tr: array of int
+                Training binary label corresponding to the given data stream
+            x_te: array of float
+                Test values for the given data stream
+            y_te: array of int
+                Test binary label corresponding to the given data stream
+        """
         x = self.dataset.data
         y = self.dataset.target
         # Binarize data

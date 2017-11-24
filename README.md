@@ -69,7 +69,7 @@ python example_anomalies.py --dataset iris --model Gaussian --epochs 1 --seed 42
 At the end of the training you should see the test scores during the training
 for each epoch
 
-```
+```Python
 [  nan   nan  1.    1.    0.67  1.    0.8   0.88  0.97  0.98  0.85  1.
   0.85  0.95  0.83  0.94  0.65  0.8   0.95  0.79  0.91  0.54  0.88  0.63
   0.63  0.94  0.87  0.82  0.72  0.78  0.98  0.82  0.76  0.79  0.65  0.87

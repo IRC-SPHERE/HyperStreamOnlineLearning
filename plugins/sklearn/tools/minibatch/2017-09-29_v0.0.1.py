@@ -22,7 +22,6 @@
 from hyperstream import Tool, StreamInstance
 from hyperstream.utils import check_input_stream_count
 
-import itertools
 import numpy as np
 
 def grouper(n, iterable):
@@ -35,21 +34,19 @@ def grouper(n, iterable):
 
 class Minibatch(Tool):
     def __init__(self, batchsize, **fit_arguments):
+        """
+        Tool that aggregates several streams together and creates batches
+
+        Parameters
+        ==========
+        batchsize: integer
+            Number of streams to be joint
+        """
         super(Minibatch, self).__init__(batchsize=batchsize)
 
     @check_input_stream_count(1)
     def _execute(self, sources, alignment_stream, interval):
         s0 = sources[0].window(interval, force_calculation=True).items()
 
-        i = 1
-        for batch in grouper(self.batchsize, s0):
-            i += 1
-            dt = batch[0][0]
-            # Try to reduce these 5 lines into one?
-            x_te = np.concatenate([b[1]['x_te'] for b in batch])
-            x_tr = np.concatenate([b[1]['x_tr'] for b in batch])
-            y_te = np.concatenate([b[1]['y_te'] for b in batch])
-            y_tr = np.concatenate([b[1]['y_tr'] for b in batch])
-            value = dict(x_te=x_te, x_tr=x_tr, y_te=y_te, y_tr=y_tr)
+        for dt, value in grouper(self.batchsize, s0):
             yield StreamInstance(dt, value)
-            # Try to reduce these 5 lines into one?

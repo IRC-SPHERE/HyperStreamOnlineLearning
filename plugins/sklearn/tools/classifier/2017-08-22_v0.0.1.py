@@ -26,12 +26,46 @@ import numpy as np
 
 
 class Classifier(Tool):
+    """Trains and generates predictions with a machine learning model
+
+    Tool that expects a stream of training and testing data and an online
+    learning model and outputs the predictions of the model while at the same
+    time trains it.
+    """
     def __init__(self, model, **fit_arguments):
+        """
+        It requires an online-learning model.
+
+        Parameters
+        ==========
+        model: object with the following functions
+            partial_fit or fit(x, y, **kwargs):
+                trains the model with x and y
+            predict_proba or predict(x):
+                returns a prediction for x
+            score(x, y):
+                returns a performance measure for the pair x and y
+
+        fit_arguments: dictionary (Not implemented yet)
+            Dictionary that will be passed to the fit function as **kwargs
+        """
         super(Classifier, self).__init__(model=model,
                                          fit_arguments=fit_arguments)
 
     @check_input_stream_count(1)
     def _execute(self, sources, alignment_stream, interval):
+        """
+        It expects at least one source of streams, each streams with a
+        dictionary with training and test data in the form:
+        x_tr: array of float
+            Training values for the given data stream
+        y_tr: array of int
+            Training binary label corresponding to the given data stream
+        x_te: array of float
+            Test values for the given data stream
+        y_te: array of int
+            Test binary label corresponding to the given data stream
+        """
         s0 = sources[0].window(interval, force_calculation=True).items()
 
         first = True
