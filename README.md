@@ -1,4 +1,6 @@
-# SklearnHyperStream
+# HyperStreamOnlineLearning
+
+Online Learning for [HyperStream](https://github.com/IRC-SPHERE/HyperStream).
 
 ## Run a test
 
