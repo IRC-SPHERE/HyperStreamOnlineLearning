@@ -12,8 +12,8 @@ Once the MongoDB server is up and running you can try to run the following code
 that should finish with the scores of a model trained on Iris dataset.
 
 ```bash
-git clone git@github.com:IRC-SPHERE/SklearnHyperStream.git
-cd SklearnHyperStream
+git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
+cd HyperStreamOnlineLearning
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
@@ -35,8 +35,8 @@ There is an additional example using Keras to specify Multilayer Perceptrons or
 Logistic regression. To run the example use these steps
 
 ```bash
-git clone git@github.com:IRC-SPHERE/SklearnHyperStream.git
-cd SklearnHyperStream
+git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
+cd HyperStreamOnlineLearning
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
@@ -59,8 +59,8 @@ test data has been drawn from the same distribution. In this case using a
 Multivariate-Gaussian to estimate the density of the training data.
 
 ```bash
-git clone git@github.com:IRC-SPHERE/SklearnHyperStream.git
-cd SklearnHyperStream
+git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
+cd HyperStreamOnlineLearning
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
