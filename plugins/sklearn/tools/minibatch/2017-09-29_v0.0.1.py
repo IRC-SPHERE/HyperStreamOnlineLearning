@@ -18,6 +18,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+import itertools
 
 from hyperstream import Tool, StreamInstance
 from hyperstream.utils import check_input_stream_count
@@ -48,5 +49,14 @@ class Minibatch(Tool):
     def _execute(self, sources, alignment_stream, interval):
         s0 = sources[0].window(interval, force_calculation=True).items()
 
-        for dt, value in grouper(self.batchsize, s0):
-            yield StreamInstance(dt, value)
+        for group in grouper(self.batchsize, s0):
+            values = {}
+            for stream in group:
+                for key, value in stream.value.items():
+                    if key in values:
+                        values[key].append(value)
+                    else:
+                        values[key] = [value]
+            for key in values.keys():
+                values[key] = np.concatenate(values[key])
+            yield StreamInstance(group[-1].timestamp, values)
