@@ -80,7 +80,7 @@ for each epoch
 
 ## Example of Incremental PCA
 
-```Python
+```bash
 python example_incremental_pca.py --dataset digits --components 10 --epochs 10 --seed 42 -b 100
 ```
 
