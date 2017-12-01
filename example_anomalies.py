@@ -3,72 +3,10 @@ import argparse
 
 from datetime import datetime, timedelta
 
-from sklearn import datasets, linear_model
+from sklearn import datasets
 
 from hyperstream import HyperStream, TimeInterval
-from hyperstream.utils import UTC
-
-
-class BackgroundCheck(object):
-    def __init__(self, model):
-        self.model = model
-
-    def fit(self, x):
-        self.model.fit(x)
-
-    def prob_foreground(self, x):
-        l = self.model.likelihood(x)
-        l_max = self.model.max
-        return np.true_divide(l, l_max)
-
-    def prob_background(self, x):
-        return 1 - self.prob_foreground(x)
-
-    def predict_proba(self, x):
-        return self.prob_background(x)
-
-
-class GaussianEstimator(object):
-    def __init__(self):
-        self.mu = None
-        self.cov = None
-        self.N = 0
-
-    def fit(self, x):
-        N = x.shape[1]
-        mu = np.mean(x, axis=0)
-        cov = np.cov(x, rowvar=False)
-
-        if self.N is 0:
-            self.N = N
-            self.mu = mu
-            self.k = len(mu)
-            self.cov = cov
-        else:
-            self.mu = np.true_divide((self.mu * self.N) + (mu * N), self.N + N)
-            self.cov = np.true_divide((self.cov * self.N) + (cov * N), self.N + N)
-            self.N += N
-
-    def likelihood(self, x):
-        return np.exp(self.log_likelihood(x))
-
-    def log_likelihood(self, x):
-        x_mu = x - self.mu
-        # a = np.array([[1, 2]])
-        # b = np.array([[1, 2],[3,4]])
-        # np.inner(np.inner(a, b.T), a)
-        inverse = np.linalg.pinv(self.cov)
-        exp = np.array([np.inner(np.inner(a, inverse.T), a) for a in x_mu])
-        return - 0.5 * (
-                    np.log(np.linalg.det(self.cov))
-                    + exp \
-                    + self.k * np.log(2*np.pi)
-                    )
-
-    @property
-    def max(self):
-        return self.likelihood(self.mu.reshape(1,-1))
-
+from plugins.sklearn.utils import GaussianEstimator, BackgroundCheck
 
 
 def get_arguments():
@@ -102,23 +40,18 @@ def main(dataset, model, epochs, seed, batchsize):
                                                  epochs=epochs, seed=seed)
     data_stream = M.get_or_create_stream('dataset')
 
-    if model == 'Gaussian':
-        model = BackgroundCheck(GaussianEstimator())
-    else:
-        raise(ValueError('Unknown model {}'.format(model)))
-
     anomaly_detector_tool = hs.plugins.sklearn.tools.anomaly_detector(model)
     anomaly_detector_stream = M.get_or_create_stream('anomaly_detector')
 
-    now = datetime.utcnow().replace(tzinfo=UTC)
-    now = (now - timedelta(hours=1)).replace(tzinfo=UTC)
-    before = datetime.utcfromtimestamp(0).replace(tzinfo=UTC)
+    now = datetime.utcnow()
+    now = (now - timedelta(hours=1))
+    before = datetime.utcfromtimestamp(0)
     ti = TimeInterval(before, now)
 
     data_tool.execute(sources=[], sink=data_stream, interval=ti)
 
     print("Example of a data stream")
-    key, value = data_stream.window().iteritems().next()
+    key, value = next(iter(data_stream.window()))
     print('[%s]: %s' % (key, value))
 
     mini_batch_tool = hs.plugins.sklearn.tools.minibatch(batchsize=batchsize)
@@ -134,7 +67,7 @@ def main(dataset, model, epochs, seed, batchsize):
         probas.append(value['proba'])
 
     # The data is repeated the number of epochs. This makes the mini-batches to
-    # cycle and contain data from the begining and end of the dataset. This
+    # cycle and contain data from the beginning and end of the dataset. This
     # makes possible that the number of scores is not divisible by epochs.
     probas = np.array(probas)
     print(probas.shape)
