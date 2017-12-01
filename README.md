@@ -4,7 +4,8 @@ Online Learning for [HyperStream](https://github.com/IRC-SPHERE/HyperStream).
 
 ## Table of Contents
   - [Requirements](#requirements)
-  - [Run a simple test](#run-a-simple-test)
+  - [Unittest](#unittest)
+  - [Run a simple classification test](#run-a-simple-classification-test)
   - [Example with Keras](#example-with-keras)
   - [Example of Anomaly detection](#example-of-anomaly-detection)
   - [Example of Incremental PCA](#example-of-incremental-pca)
@@ -34,7 +35,25 @@ pip install -r keras_requirements.txt
 
 Once the MongoDB server is up and running and you have installed all the Python requirements you can try to run the some fo the following examples:
 
-## Run a simple test
+## Unittest
+
+To test if the code is working you can run a nosetest
+
+```bash
+nosetest
+```
+
+You should get something of the style
+
+```bash
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.585s
+
+OK
+```
+
+## Run a simple classification test
 
 The following code should finish with the scores of a model trained on Iris dataset.
 
