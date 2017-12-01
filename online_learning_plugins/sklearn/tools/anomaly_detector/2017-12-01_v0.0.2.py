@@ -21,7 +21,7 @@
 
 from hyperstream import Tool, StreamInstance
 from hyperstream.utils import check_input_stream_count
-from plugins.sklearn.utils import GaussianEstimator, BackgroundCheck
+from online_learning_plugins.sklearn.utils import GaussianEstimator, BackgroundCheck
 
 
 class AnomalyDetector(Tool):

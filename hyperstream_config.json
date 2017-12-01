@@ -8,7 +8,7 @@
     "plugins": [{
         "channel_id_prefix": "sklearn",
         "channel_names": [],
-        "path": "plugins/sklearn",
+        "path": "online_learning_plugins/sklearn",
         "has_tools": true,
         "has_assets": false
     }],

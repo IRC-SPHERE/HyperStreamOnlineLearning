@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from sklearn import datasets
 
 from hyperstream import HyperStream, TimeInterval
-from plugins.sklearn.utils import GaussianEstimator, BackgroundCheck
 
 
 def get_arguments():
