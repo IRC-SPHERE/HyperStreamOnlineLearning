@@ -2,14 +2,21 @@
 
 Online Learning for [HyperStream](https://github.com/IRC-SPHERE/HyperStream).
 
-## Run a test
+## Table of Contents
+  - [Requirements](#requirements)
+  - [Run a simple test](#run-a-simple-test)
+  - [Example with Keras](#example-with-keras)
+  - [Example of Anomaly detection](#example-of-anomaly-detection)
+  - [Example of Incremental PCA](#example-of-incremental-pca)
+  - [Example of an Autoencoder with Keras](#example-of-an-autoencoder-with-keras)
+
+## Requirements
 
 Running any example of HyperStream requires a MongoDB server. The configuration
 of the host and ports of the MongoDB server can be changed in the file
 `hyperstream_config.json` if needed.
 
-Once the MongoDB server is up and running you can try to run the following code
-that should finish with the scores of a model trained on Iris dataset.
+To download the code and install the requirements ussing virtualenvironment just do the following:
 
 ```bash
 git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
@@ -17,6 +24,15 @@ cd HyperStreamOnlineLearning
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
+```
+
+Once the MongoDB server is up and running and you have installed all the Python requirements you can try to run the some fo the following examples:
+
+## Run a simple test
+
+The following code should finish with the scores of a model trained on Iris dataset.
+
+```bash
 python example_classifier.py --dataset iris --classifier SGDClassifier --epochs 20 --seed 42
 ```
 
@@ -99,7 +115,7 @@ Test scores per minibatch (cyclic)
    5.17  5.21  5.32  5.23  5.08  5.04]]
 ```
 
-## Example of Autoencoder with Keras
+## Example of an Autoencoder with Keras
 
 ```bash
 python example_autoencoder_keras.py --dataset digits --architecture auto40s20s10s --epochs 10 --seed 42 -b 100
