@@ -26,6 +26,12 @@ virtualenv venv
 pip install -r requirements.txt
 ```
 
+If you want to run the examples with Keras you will need to install some additional dependences. Once the previous requirements have been installed you can install the rest with the following command:
+
+```bash
+pip install -r keras_requirements.txt
+```
+
 Once the MongoDB server is up and running and you have installed all the Python requirements you can try to run the some fo the following examples:
 
 ## Run a simple test
@@ -51,12 +57,6 @@ There is an additional example using Keras to specify Multilayer Perceptrons or
 Logistic regression. To run the example use these steps
 
 ```bash
-git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
-cd HyperStreamOnlineLearning
-virtualenv venv
-. venv/bin/activate
-pip install -r requirements.txt
-pip install -r keras_requirements.txt
 python example_classifier_keras.py --dataset digits --classifier mlp30ds40m --epochs 20 --seed 42
 ```
 
@@ -75,12 +75,6 @@ test data has been drawn from the same distribution. In this case using a
 Multivariate-Gaussian to estimate the density of the training data.
 
 ```bash
-git clone git@github.com:IRC-SPHERE/HyperStreamOnlineLearning.git
-cd HyperStreamOnlineLearning
-virtualenv venv
-. venv/bin/activate
-pip install -r requirements.txt
-pip install -r keras_requirements.txt
 python example_anomalies.py --dataset iris --model Gaussian --epochs 1 --seed 42 -b 2
 ```
 
