@@ -128,7 +128,7 @@ Test scores per minibatch (cyclic)
    5.17  5.21  5.32  5.23  5.08  5.04]]
 ```
 
-![pca_inverse_transform.svg][pca_inverse_transform.svg]
+![pca_inverse_transform.svg](pca_inverse_transform.svg)
 
 ## Example of an Autoencoder with Keras
 
@@ -204,4 +204,4 @@ Test scores per minibatch (cyclic)
 [[ 65.96  58.56  60.33 ...,  13.54  10.89  12.94]]
 ```
 
-![autoencoder_auto30ns10ns2ns_10ns30ns.svg][autoencoder_auto30ns10ns2ns_10ns30ns.svg]
+![autoencoder_auto30ns10ns2ns_10ns30ns.svg](autoencoder_auto30ns10ns2ns_10ns30ns.svg)
