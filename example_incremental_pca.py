@@ -11,6 +11,10 @@ from sklearn.metrics import mean_squared_error as mse
 from hyperstream import HyperStream, TimeInterval
 from hyperstream.utils import UTC
 
+import matplotlib.pyplot as plt
+
+from utils import generate_hidden_images
+
 
 class MyIncrementalPCA(IncrementalPCA):
     def score(self, x, pred):
@@ -87,6 +91,14 @@ def main(dataset, components, epochs, seed, batchsize):
         scores = np.array(scores).reshape(1,-1)
         print("Test scores per minibatch (cyclic)")
         print(scores.round(decimals=2))
+
+    if dataset == 'digits' and components == 2:
+        minmax = 15
+        image = generate_hidden_images(model, digit_size=8, n=15, minmax=minmax)
+        fig = plt.figure(figsize=(6,6))
+        ax = fig.add_subplot(111)
+        ax.imshow(image, extent = [-minmax, minmax, -minmax, minmax], cmap='Greys')
+        fig.savefig('pca_inverse_transform.svg')
 
 
 if __name__ == '__main__':

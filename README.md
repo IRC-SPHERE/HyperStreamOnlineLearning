@@ -128,75 +128,80 @@ Test scores per minibatch (cyclic)
    5.17  5.21  5.32  5.23  5.08  5.04]]
 ```
 
+![pca_inverse_transform.svg][pca_inverse_transform.svg]
+
 ## Example of an Autoencoder with Keras
 
 ```bash
-python example_autoencoder_keras.py --dataset digits --architecture auto40s20s10s --epochs 10 --seed 42 -b 100
+python example_autoencoder_keras.py --dataset digits --architecture auto30ns10ns2ns_10ns30ns --epochs 100 --seed 42 -b 10 --learning-rate 0.1
 ```
 
 Will output the following
 
 ```Python
 _________________________________________________________________
-Layer (type)                 Output Shape              Param #
+Layer (type)                 Output Shape              Param #                         [20/9638]
 =================================================================
-dense_1 (Dense)              (None, 40)                2600
+dense_1 (Dense)              (None, 30)                1950
 _________________________________________________________________
-activation_1 (Activation)    (None, 40)                0
+batch_normalization_1 (Batch (None, 30)                120
 _________________________________________________________________
-dense_2 (Dense)              (None, 20)                820
+activation_1 (Activation)    (None, 30)                0
 _________________________________________________________________
-activation_2 (Activation)    (None, 20)                0
+dense_2 (Dense)              (None, 10)                310
 _________________________________________________________________
-dense_3 (Dense)              (None, 10)                210
+batch_normalization_2 (Batch (None, 10)                40
 _________________________________________________________________
-activation_3 (Activation)    (None, 10)                0
+activation_2 (Activation)    (None, 10)                0
+_________________________________________________________________
+dense_3 (Dense)              (None, 2)                 22
+_________________________________________________________________
+batch_normalization_3 (Batch (None, 2)                 8
+_________________________________________________________________
+activation_3 (Activation)    (None, 2)                 0
 =================================================================
-Total params: 3,630
-Trainable params: 3,630
-Non-trainable params: 0
+Total params: 2,450
+Trainable params: 2,366
+Non-trainable params: 84
 _________________________________________________________________
 None
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #
 =================================================================
-dense_4 (Dense)              (None, 10)                110
+dense_4 (Dense)              (None, 10)                30
+_________________________________________________________________
+batch_normalization_4 (Batch (None, 10)                40
 _________________________________________________________________
 activation_4 (Activation)    (None, 10)                0
 _________________________________________________________________
-dense_5 (Dense)              (None, 20)                220
+dense_5 (Dense)              (None, 30)                330
 _________________________________________________________________
-activation_5 (Activation)    (None, 20)                0
+batch_normalization_5 (Batch (None, 30)                120
 _________________________________________________________________
-dense_6 (Dense)              (None, 40)                840
+activation_5 (Activation)    (None, 30)                0
 _________________________________________________________________
-dense_7 (Dense)              (None, 64)                2624
+dense_6 (Dense)              (None, 64)                1984
 =================================================================
-Total params: 3,794
-Trainable params: 3,794
-Non-trainable params: 0
+Total params: 2,504
+Trainable params: 2,424
+Non-trainable params: 80
 _________________________________________________________________
 None
 _________________________________________________________________
-Layer (type)                 Output Shape              Param #
+Layer (type)                 Output Shape              Param #   
 =================================================================
-sequential_1 (Sequential)    (None, 10)                3630
+sequential_1 (Sequential)    (None, 2)                 2450      
 _________________________________________________________________
-sequential_2 (Sequential)    (None, 64)                3794
+sequential_2 (Sequential)    (None, 64)                2504      
 =================================================================
-Total params: 7,424
-Trainable params: 7,424
-Non-trainable params: 0
+Total params: 4,954
+Trainable params: 4,790
+Non-trainable params: 164
 _________________________________________________________________
 None
+2017-12-04 15:49:37.732891: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX
 Test scores per minibatch (cyclic)
-[[ 58.15  57.16  57.83  59.39  56.94  56.84  56.45  55.91  55.95  54.46
-   53.64  54.08  55.71  53.21  53.16  52.72  52.25  52.09  50.4   49.72
-   50.25  51.62  49.02  48.96  48.54  47.99  47.7   46.05  45.28  45.9
-   46.92  44.46  44.27  43.95  43.35  42.86  41.41  40.64  41.19  41.7
-   39.84  39.5   39.02  38.45  38.18  36.63  35.98  36.3   36.71  35.13
-   34.8   34.37  33.7   33.57  32.07  31.52  31.79  31.83  30.78  30.42
-   29.96  29.55  29.17  28.03  27.46  27.77  27.57  26.84  26.63  26.12
-   25.8   25.66  24.67  24.17  24.46  24.02  23.63  23.68  23.1   22.87
-   22.96  22.2   21.7   22.    21.41  21.39  21.56  20.95  20.82  20.97]]
+[[ 65.96  58.56  60.33 ...,  13.54  10.89  12.94]]
 ```
+
+![autoencoder_auto30ns10ns2ns_10ns30ns.svg][autoencoder_auto30ns10ns2ns_10ns30ns.svg]

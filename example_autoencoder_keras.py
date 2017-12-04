@@ -13,8 +13,14 @@ from hyperstream.utils import UTC
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
+from keras.layers.normalization import BatchNormalization
 from keras.optimizers import SGD
 from keras.wrappers.scikit_learn import KerasClassifier
+
+import matplotlib.pyplot as plt
+
+from utils import generate_hidden_images
+
 
 class MyKerasUnsupervised(object):
     """This is a modification of the KerasUnsupervised in order to keep the
@@ -58,45 +64,43 @@ class MyKerasUnsupervised(object):
 
 
         previous_layer = input_dim
-        self.architecture = re.split('(\d+)', architecture)
+        aux_architecture = re.split('(\d+)', architecture)
+        self.architecture = [aux_architecture[0]]
+        for s in aux_architecture[1:]:
+            if s.isdigit():
+                self.architecture.append(s)
+            else:
+                for ss in s:
+                    self.architecture.append(ss)
         if self.architecture[0] == 'auto':
             encoder = Sequential()
+            decoder = Sequential()
+
+            actual = encoder
             for i in range(1, len(self.architecture)):
                 if self.architecture[i] == 'd':
-                    encoder.add(Dropout(0.5))
+                    actual.add(Dropout(0.5))
                 elif self.architecture[i] == 's':
-                    encoder.add(Activation('sigmoid'))
+                    actual.add(Activation('sigmoid'))
+                elif self.architecture[i] == 'r':
+                    actual.add(Activation('relu'))
                 elif self.architecture[i] == 'm':
-                    encoder.add(Dense(input_size, kernel_initializer=init))
-                    encoder.add(Activation('softmax'))
+                    actual.add(Dense(input_size, kernel_initializer=init))
+                    actual.add(Activation('softmax'))
+                elif self.architecture[i] == 'n':
+                    actual.add(BatchNormalization())
                 elif self.architecture[i].isdigit():
                     actual_layer = int(self.architecture[i])
-                    encoder.add(Dense(actual_layer, input_dim=previous_layer,
+                    actual.add(Dense(actual_layer, input_dim=previous_layer,
                                     kernel_initializer=init))
                     previous_layer = actual_layer
                 elif self.architecture[i] == 'l':
                     continue
+                elif self.architecture[i] == '_':
+                    actual = decoder
                 else:
                     raise(ValueError, 'Architecture with a wrong specification')
 
-            decoder = Sequential()
-            for i in reversed(range(1, len(self.architecture)-1)):
-                if self.architecture[i] == 'd':
-                    decoder.add(Dropout(0.5))
-                elif self.architecture[i] == 's':
-                    decoder.add(Activation('sigmoid'))
-                elif self.architecture[i] == 'm':
-                    decoder.add(Dense(input_size, kernel_initializer=init))
-                    decoder.add(Activation('softmax'))
-                elif self.architecture[i].isdigit():
-                    actual_layer = int(self.architecture[i])
-                    decoder.add(Dense(actual_layer, input_dim=previous_layer,
-                                    kernel_initializer=init))
-                    previous_layer = actual_layer
-                elif self.architecture[i] == 'l':
-                    continue
-                else:
-                    raise(ValueError, 'Architecture with a wrong specification')
             decoder.add(Dense(input_dim, input_dim=previous_layer,
                             kernel_initializer=init))
         else:
@@ -159,6 +163,11 @@ def get_arguments():
     return parser.parse_args()
 
 
+def plot_digit(x):
+    shape = int(np.sqrt(x.shape[1]))
+    x.reshape(shape, shape)
+
+
 def main(dataset, architecture, epochs, seed, batchsize, learning_rate):
     hs = HyperStream(loglevel=30)
     print(hs)
@@ -209,6 +218,14 @@ def main(dataset, architecture, epochs, seed, batchsize, learning_rate):
         scores = np.array(scores).reshape(1,-1)
         print("Test scores per minibatch (cyclic)")
         print(scores.round(decimals=2))
+
+    if dataset == 'digits' and model.decoder.input_shape[1] == 2:
+        minmax = 5
+        image = generate_hidden_images(model, digit_size=8, n=15, minmax=minmax)
+        fig = plt.figure(figsize=(6,6))
+        ax = fig.add_subplot(111)
+        ax.imshow(image, extent = [-minmax, minmax, -minmax, minmax], cmap='Greys')
+        fig.savefig('autoencoder_{}.svg'.format(architecture))
 
 
 if __name__ == '__main__':
